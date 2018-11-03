@@ -1,18 +1,19 @@
 {
-  "author": "Tatsuhiko Miyagawa",
-  "name": "hubot-cron",
-  "version": "0.2.9",
+  "author": "Blixa Morgan",
+  "name": "@mrmakeit/hubot-cron-auth",
+  "version": "0.0.1",
   "description": "Cron job messaging for hubot",
-  "homepage": "https://github.com/miyagawa/hubot-cron",
+  "homepage": "https://github.com/mrmakeit/hubot-cron-auth",
   "main": "./src/index.coffee",
   "repository": {
     "type": "git",
-    "url": "git://github.com/miyagawa/hubot-cron.git"
+    "url": "git://github.com/mrmakeit/hubot-cron-auth.git"
   },
   "license": "MIT",
   "keywords": [
     "hubot",
-    "cron"
+    "cron",
+    "auth"
   ],
   "dependencies": {
     "coffee-script": ">= 1.1.0",

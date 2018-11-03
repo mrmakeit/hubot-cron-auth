@@ -83,13 +83,22 @@ module.exports = (robot) ->
     syncJobs robot
 
   robot.respond /(?:new|add) job "(.*?)" (.*)$/i, (msg) ->
-    handleNewJob robot, msg, msg.match[1], msg.match[2]
+    if robot.auth.hasRole(msg.envelope.user, "cron")
+      handleNewJob robot, msg, msg.match[1], msg.match[2]
+    else
+      msg.send "Adding new cron jobs is restricted"
 
   robot.respond /(?:new|add) job (.*) "(.*?)" *$/i, (msg) ->
-    handleNewJob robot, msg, msg.match[1], msg.match[2]
+    if robot.auth.hasRole(msg.envelope.user, "cron")
+      handleNewJob robot, msg, msg.match[1], msg.match[2]
+    else
+      msg.send "Adding new cron jobs is restricted"
 
   robot.respond /(?:new|add) job (.*?) say (.*?) *$/i, (msg) ->
-    handleNewJob robot, msg, msg.match[1], msg.match[2]
+    if robot.auth.hasRole(msg.envelope.user, "cron")
+      handleNewJob robot, msg, msg.match[1], msg.match[2]
+    else
+      msg.send "Adding new cron jobs is restricted"
 
   robot.respond /(?:list|ls) jobs?/i, (msg) ->
     text = ''
@@ -101,17 +110,23 @@ module.exports = (robot) ->
     msg.send text if text.length > 0
 
   robot.respond /(?:rm|remove|del|delete) job (\d+)/i, (msg) ->
-    if (id = msg.match[1]) and unregisterJob(robot, id)
-      msg.send "Job #{id} deleted"
+    if robot.auth.hasRole(msg.envelope.user, "cron")
+      if (id = msg.match[1]) and unregisterJob(robot, id)
+        msg.send "Job #{id} deleted"
+      else
+        msg.send "Job #{id} does not exist"
     else
-      msg.send "Job #{id} does not exist"
+      msg.send "Removing cron jobs is restricted"
 
   robot.respond /(?:rm|remove|del|delete) job with message (.+)/i, (msg) ->
-    message = msg.match[1]
-    for id, job of JOBS
-      room = job.user.reply_to || job.user.room
-      if (room == msg.message.user.reply_to or room == msg.message.user.room) and job.message == message and unregisterJob(robot, id)
-        msg.send "Job #{id} deleted"
+    if robot.auth.hasRole(msg.envelope.user, "cron")
+      message = msg.match[1]
+      for id, job of JOBS
+        room = job.user.reply_to || job.user.room
+        if (room == msg.message.user.reply_to or room == msg.message.user.room) and job.message == message and unregisterJob(robot, id)
+          msg.send "Job #{id} deleted"
+    else
+      msg.send "Removing cron jobs is restricted"
 
   robot.respond /(?:tz|timezone) job (\d+) (.*)/i, (msg) ->
     if (id = msg.match[1]) and (timezone = msg.match[2]) and updateJobTimezone(robot, id, timezone)
